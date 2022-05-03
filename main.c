@@ -2,30 +2,51 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <time.h>
-#define DEF_LENGTH 30
+
+#define DEFAULT_LENGTH 30
 #define MAX_LENGTH 4096
 
-char *charspace = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()`~-_+={[}]|\\;:'\",<.>/?\0";
-unsigned int pass_length = DEF_LENGTH;
-unsigned int prefix_len;
-unsigned int mode = 1;
-char *passphrase, opt;
-unsigned int mode_arr[] = {72, 10, 36, 62, 94};
+typedef struct string {
+	char *val;
+	uint64_t length;
+} string;
+
+char charset[100];
+uint32_t len_charset = 0;
+
+bool check_valid(char *regex_str) {
+	return false;
+}
+
+char **parse(char *regex_str) {
+	char **tokens;
+	return tokens;
+}
+
+int gen_charset(char *regex_str) {
+	return -1;	
+}
 
 void print_usage() {
-};
+	return;
+}
 
 int main(int argc, char *argv[]) {
-	while( (opt = getopt(argc, argv, "l:m:")) != EOF ) {
+	char *passphrase;
+	char opt, regex_str;
+	uint32_t len_p = DEFAULT_LENGTH;
+	
+	while( (opt = getopt(argc, argv, "l:c:")) != EOF ) {
 		switch(opt) {
 			case 'l':
-				pass_length = atoi(optarg);
-				pass_length = (pass_length > MAX_LENGTH) ? MAX_LENGTH : pass_length;
+				len_p = atoi(optarg);
+				len_p = (len_p > MAX_LENGTH) ? MAX_LENGTH : len_p;
 				break;
-			case 'm':
-				mode = atoi(optarg);
-				mode = (mode < 1 || mode > 5) ? 1 : mode;
+			case 'c':
+				regex_str = optarg;
 				break;
 			case 'h':
 				print_usage();
@@ -36,19 +57,19 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	passphrase = (char *) malloc( pass_length + 1 );
-	srand(time(0));
-	prefix_len = mode_arr[mode - 1];
-	for(int i = 0; i < pass_length; i++) {
-		passphrase[i] = charspace[rand() % prefix_len];
+	passphrase = (char *) malloc( len_p + 1 );
+	srandom(time(0));
+	
+	for(int i = 0; i < len_p; i++) {
+		passphrase[i] = charset[random() % len_charset];
 	}
-	passphrase[pass_length] = '\0';
+	passphrase[len_p] = '\0';
+	
 	printf("%s\n", passphrase);
-	free(passphrase);
 	return EXIT_SUCCESS;
 }
 
 /* Command line options:
  * -l : length of the password to be generated <int>
- * -m : <int> character mode
+ * -c : character set regex <str>
  */
